@@ -1,0 +1,1161 @@
+################################
+# ModBus Registers
+################################
+# # ModBus Register Outputs
+global UR_STATUS = "UR_STATUS"
+global JOB_STATUS = "JOB_STATUS"
+global GR1 = "GR1"
+global GR2 = "GR2"
+global GR3 = "GR3"
+global GR4 = "GR4"
+# # ModBus Register INPUTS
+global JOB_NR = "JOB_NR"
+global TRAY_NR = "TRAY_NR"
+global POSITION = "POSITION"
+global GR1_STATUS = "GR1_STATUS"
+global GR2_STATUS = "GR2_STATUS"
+global GR3_STATUS = "GR3_STATUS"
+global GR4_STATUS = "GR4_STATUS"
+global WECHSELSATZ = "WECHSELSATZ"
+global RESET = "RESET"
+global DIRECT = "DIRECT"
+global SIM = "SIM"
+global Ohne_Praegung = "Ohne_Praegung"
+
+################################
+# Permanent State Vars
+################################
+# UR Status
+global NA = 0
+global UR_READY_HOME = 1
+global UR_READY_NOHOME = 2
+global UR_BUSY = 3
+global UR_ERROR = 4
+# job Status
+global JOB_RUNNING = 1
+global JOB_OK = 2
+global JOB_NOK = 3
+
+################################
+# General variables
+################################
+global big_radius = 0.07
+global small_radius = 0.01
+# Job Vars
+global calc = False
+global job = 0
+global tray = 0
+global pos = 0
+global ws = 0
+global dir = 0
+global sim = 0
+global ohne_praegung = 0
+
+global int_tray = 0
+global int_pos = 0
+global int_ws = 0
+global int_dir = 0
+# Pos Vars
+val = p[0,0,0,0,0,0]
+poses = [val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val,val]
+
+global picks1 = poses
+global picks2 = poses
+global picks3 = poses
+global picks4 = poses
+global picks5 = poses
+global picks6 = poses
+
+global near_left = [d2r(-50),d2r(-80),d2r(-95),d2r(-111),d2r(91),d2r(-92)]
+global near_right = [d2r(-116),d2r(-80),d2r(-111),d2r(-87),d2r(94),d2r(-142)]
+global near_dosier = [d2r(18),d2r(-62.61),d2r(-123.26),d2r(-103.15),d2r(88),d2r(-25)]
+#global near_dosier_gr4 = [d2r(-1),d2r(-62),d2r(-127),d2r(-81),d2r(92),d2r(-270)]
+global near_dosier_gr4 = [d2r(-1),d2r(-62),d2r(-127),d2r(-81),d2r(92),d2r(45)]
+global near_heater = [d2r(-150),d2r(-75),d2r(-102),d2r(-92),d2r(92),d2r(-240)]
+global home_q = [d2r(-79),d2r(-75),d2r(-109.5),d2r(-86),d2r(90),d2r(-79.2)]
+global near_tray_5 = [d2r(-123.5),d2r(-93.75),d2r(-100.6),d2r(-96.3),d2r(90),d2r(-163.18)]
+
+# Product / Tray Vars
+global tr_ids=[[4,2,2],[4,2,2],[4,2,2],[4,1,1],[5,3,3],[5,3,3],[5,3,3],[7,6,6],[11,9,9],[11,8,8],[12,11,11],[12,11,11],[12,10,10],[12,10,10],[12,10,10]]
+global heights=[[1.55,0.3,2],[1.37,0.3,1.6],[1.39,0.3,1.6],[1.5,0.3,1.6],[1.84,0.3,1.6],[1.99,0.3,1.6],[2.02,0.3,1.6],[2.39,0.3,1.5],[3.34,0.3,1.5],[3.73,0.3,1.5],[2.255,0.2,2.5],[3.34,0.2,1.5],[3.52,0.2,1.5],[3.6,0.2,1.5],[3.73,0.2,1.5]]
+global tcp_up=[0,0,0,0,0,0,0,3,3,3,3,3,3,3,3]
+global do_cam=[3,1,1,1,1,1,1,1,2,2,0,2,2,2,2]
+#
+global tcpup = 0
+
+global offs_x=[13.5,14,16.5,18,17.5,24.5,24.3,28.56,37.5,34.2,34.2,37.5]
+global offs_y=[13.95,15.45,17.95,17.95,22.95,27.95,24.25,37.95,37.95,34.25,34.25,37.5]
+global offs_z=[7.19,7.19,7.19,4.19,7.19,7.19,3.91,7.19,7.19,2.1,3.1,17.19]
+global dist_x=[18,20.5,23.5,25.5,28,40,44.4,51.5,60,61.65,61.65,-1]
+global dist_y=[18,21,25,25,30,38,43.7,60,60,67.4,67.4,-1]
+global max_x=[17,15,13,12,11,8,7,6,5,5,5,4]
+global max_y=[7,6,5,5,4,3,3,2,2,2,2,2]
+global total=[119,90,65,60,44,24,21,12,10,10,10,8]
+
+################################
+# TCPS
+################################
+global tcps = [gr1_small,gr2_small,gr3_small,gr1_big,gr2_big,gr3_big,para,cam] # TCPs set in VorStart
+
+################################
+# Installation variables 
+################################
+#Speed and Accel
+# ins_acc_l
+# ins_vel_l
+# ins_acc_j
+# ins_vel_j
+#Status Variables
+# status_ur
+# status_job
+# **** Positions ****
+global home_pos_p = home
+# fr_1a
+# fr_1b
+# fr_2a
+# fr_2b
+# fr_3a
+# fr_3b
+# hs_frame
+# io_frame
+# put_dosier
+# pick_up_dos
+# rev_poses = [p[0,0,0,0,0,0],p[0,0,0,0,0,0],p[0,0,0,0,0,0],p[0,0,0,0,0,0],p[0,0,0,0,0,0]]
+global pick_frames = [fr_1a,fr_1b,fr_2a,fr_2b,fr_3a,fr_3b]
+
+################################
+# ModBus Comm Thread
+################################
+thread comm():
+  i = 0
+  while True:
+    # Eingaenge
+    job = modbus_get_signal_status(JOB_NR, False)
+    tray = modbus_get_signal_status(TRAY_NR, False)
+    pos = modbus_get_signal_status(POSITION, False)
+    ws = modbus_get_signal_status(WECHSELSATZ, False)
+    dir = modbus_get_signal_status(DIRECT, False)
+    sim = modbus_get_signal_status(SIM, False)
+    ohne_praegung = modbus_get_signal_status(Ohne_Praegung, False)
+    # Ausgaenge 
+    modbus_set_output_register(UR_STATUS,status_ur, False)
+    modbus_set_output_register(JOB_STATUS,status_job, False)
+    sync()
+  end
+end
+comm_thread = run comm()
+
+################################
+# Store ModBus vars
+################################
+def read_vars():
+  int_pos = pos
+  int_tray = tray
+  int_ws = ws - 1
+  int_dir = dir
+end
+
+################################
+# Set TCP
+################################
+def tcp(nr):
+  set_tcp(tcps[nr])
+  last_tcp = get_tcp_offset()
+end
+
+################################
+# Check home pos
+################################
+def check_home():
+  here = get_actual_tcp_pose()
+  if point_dist(here,home) > 0.05:
+    status_ur = UR_READY_NOHOME
+    return False
+  else:
+    status_ur = UR_READY_HOME
+    return True
+  end
+end
+
+################################
+# PreCalc pickup poses
+################################
+def calc_pick_poses(loc_ws):
+  zf = 0
+  global tcpup = tcp_up[loc_ws]
+  while zf < 6:
+    id = floor(zf/2)
+    mx = max_x[tr_ids[loc_ws,id]-1]
+    my = max_y[tr_ids[loc_ws,id]-1]
+    ox = offs_x[tr_ids[loc_ws,id]-1] / 1000 + offs_tr_x / 1000
+    oy = offs_y[tr_ids[loc_ws,id]-1] / 1000 + offs_tr_y / 1000
+    oz = offs_z[tr_ids[loc_ws,id]-1] / 1000 + heights[loc_ws,id] / 1000
+    dx = dist_x[tr_ids[loc_ws,id]-1] / 1000
+    dy = dist_y[tr_ids[loc_ws,id]-1] / 1000
+    
+    temp_fr = pose_trans(pick_frames[zf],p[ox,oy,-oz,0,0,0])
+    
+
+    ip = 0
+    ix = 0
+    iy = 0
+    #popup(mx , "my = " , blocking= True)
+    #popup(pose_trans(temp_fr,p[ix*dx,iy*dy,0,d2r(180),0,0]) , "ist das ", blocking = True)
+    while ix < mx:
+      iy = 0
+      while iy < my:
+        if zf == 0:
+          picks1[ip] = pose_trans(temp_fr,p[ix*dx,iy*dy,0,d2r(180),0,0])
+          #popup(picks1[ip] , "picks1 = " , blocking= True)
+        elif zf == 1:
+          picks2[ip] = pose_trans(temp_fr,p[ix*dx,iy*dy,0,d2r(180),0,0])
+          #popup(picks2[ip] , "picks2 = " , blocking= True)
+        elif zf == 2:
+          picks3[ip] = pose_trans(temp_fr,p[ix*dx,iy*dy,0,d2r(180),0,0])
+          #popup(picks3[ip] , "picks3 = " , blocking= True)
+        elif zf == 3:
+          picks4[ip] = pose_trans(temp_fr,p[ix*dx,iy*dy,0,d2r(180),0,0])
+          #popup(picks4[ip] , "picks4 = " , blocking= True)
+        elif zf == 4:
+          picks5[ip] = pose_trans(temp_fr,p[ix*dx,iy*dy,0,d2r(180),0,0])
+          #popup(picks5[ip] , "picks5 = " , blocking= True)
+          #picks5[ip] = pose_trans(picks5[ip],p[0,0,0,0,0,d2r(-28)])
+        else:
+          picks6[ip] = pose_trans(temp_fr,p[ix*dx,iy*dy,0,d2r(180),0,0])
+          #popup(picks6[ip] , "picks6 = " , blocking= True)
+          #picks6[ip] = pose_trans(picks6[ip],p[0,0,0,0,0,d2r(-28)])
+        end
+        ip = ip + 1
+        iy = iy + 1
+      end
+      ix = ix + 1
+    end
+    zf = zf + 1
+  end
+  
+  if loc_ws > 10:
+    #TrayFrame 1 / TrayNr 12
+    picks1[0] = pose_trans(pick_frames[0],p[0.0375,0.0375,-0.01019,d2r(180),0,0])
+    picks1[1] = pose_trans(pick_frames[0],p[0.106,0.0375, -0.01019,d2r(180),0,0])
+    picks1[2] = pose_trans(pick_frames[0],p[0.1745,0.0375,-0.01019,d2r(180),0,0])
+    picks1[3] = pose_trans(pick_frames[0],p[0.243,0.0375, -0.01019,d2r(180),0,0])
+    picks1[4] = pose_trans(pick_frames[0],p[0.0715,0.0984,-0.01019,d2r(180),0,0])
+    picks1[5] = pose_trans(pick_frames[0],p[0.14,0.0984,  -0.01019,d2r(180),0,0])
+    picks1[6] = pose_trans(pick_frames[0],p[0.2085,0.0984,-0.01019,d2r(180),0,0])
+    picks1[7] = pose_trans(pick_frames[0],p[0.277,0.0984, -0.01019,d2r(180),0,0])
+
+    #TrayFrame 2 / TrayNr 12
+    picks2[0] = pose_trans(pick_frames[1],p[0.0375,0.0375,-0.01019,d2r(180),0,0])
+    picks2[1] = pose_trans(pick_frames[1],p[0.106,0.0375, -0.01019,d2r(180),0,0])
+    picks2[2] = pose_trans(pick_frames[1],p[0.1745,0.0375,-0.01019,d2r(180),0,0])
+    picks2[3] = pose_trans(pick_frames[1],p[0.243,0.0375, -0.01019,d2r(180),0,0])
+    picks2[4] = pose_trans(pick_frames[1],p[0.0715,0.0984,-0.01019,d2r(180),0,0])
+    picks2[5] = pose_trans(pick_frames[1],p[0.14,0.0984,  -0.01019,d2r(180),0,0])
+    picks2[6] = pose_trans(pick_frames[1],p[0.2085,0.0984,-0.01019,d2r(180),0,0])
+    picks2[7] = pose_trans(pick_frames[1],p[0.277,0.0984, -0.01019,d2r(180),0,0])
+  end
+  calc = True
+  return True		 
+end
+
+################################
+# Cam Load Handler (Thread)
+################################
+global go_load = False
+global object = ""
+thread cam_loader():
+  while True:
+    if go_load:
+      dsc_load_one(object)
+      go_load = False
+    end
+    sleep(0.02)
+  end
+end
+thr_cam_loader = run cam_loader()
+################################
+# Cam Handler
+#
+################################
+def cam_handler(loc_ws):
+
+  global do_cam = [3,1,1,1,1,1,1,1,2,2,0,2,2,2,2]
+  if ohne_praegung == 0 : # Mit Erkennung von Prägung
+    do_cam = [3,1,1,1,1,1,1,1,2,2,0,2,2,2,2]
+    
+  elif ohne_praegung == 1 :# Ohne Erkennung von Prägung
+    do_cam = [3,2,2,2,2,2,2,2,2,2,0,2,2,2,2]
+  end
+  
+  if loc_ws == 0:
+    if do_cam[loc_ws] == 1:
+      cam_io_1 = dsc_find_one("pr_1")
+      cam_io_2 = dsc_find_one("sl_1")
+      object = "pr_1"
+      go_load = True
+      return (cam_io_1 and cam_io_2)
+    elif do_cam[loc_ws] == 2:
+      return dsc_find_one("sl_1")
+    elif do_cam[loc_ws] == 3:
+      return dsc_find_one("pr_1")
+    else:
+      return True
+    end
+  elif loc_ws == 1:
+    if do_cam[loc_ws] == 1:
+      cam_io_1 = dsc_find_one("pr_2")
+      cam_io_2 = dsc_find_one("sl_2")
+      object = "pr_2"
+      go_load = True
+      return (cam_io_1 and cam_io_2)
+    elif do_cam[loc_ws] == 2:
+      return dsc_find_one("sl_2")
+    elif do_cam[loc_ws] == 3:
+      return dsc_find_one("pr_2")
+    else:
+      return True
+    end
+  elif loc_ws == 2:
+    if do_cam[loc_ws] == 1:
+      cam_io_1 = dsc_find_one("pr_3")
+      cam_io_2 = dsc_find_one("sl_3")
+      object = "pr_3"
+      go_load = True
+      return (cam_io_1 and cam_io_2)
+    elif do_cam[loc_ws] == 2:
+      return dsc_find_one("sl_3")
+    elif do_cam[loc_ws] == 3:
+      return dsc_find_one("pr_3")
+    else:
+      return True
+    end
+  elif loc_ws == 3:
+    if do_cam[loc_ws] == 1:
+      cam_io_1 = dsc_find_one("pr_4")
+      cam_io_2 = dsc_find_one("sl_4")
+      object = "pr_4"
+      go_load = True
+      return (cam_io_1 and cam_io_2)
+    elif do_cam[loc_ws] == 2:
+      return dsc_find_one("sl_4")
+    elif do_cam[loc_ws] == 3:
+      return dsc_find_one("pr_4")
+    else:
+      return True
+    end
+  elif loc_ws == 4:
+    if do_cam[loc_ws] == 1:
+      cam_io_1 = dsc_find_one("pr_5")
+      cam_io_2 = dsc_find_one("sl_5")
+      object = "pr_5"
+      go_load = True
+      return (cam_io_1 and cam_io_2)
+    elif do_cam[loc_ws] == 2:
+      return dsc_find_one("sl_5")
+    elif do_cam[loc_ws] == 3:
+      return dsc_find_one("pr_5")
+    else:
+      return True
+    end
+  elif loc_ws == 5:
+    if do_cam[loc_ws] == 1:
+      cam_io_1 = dsc_find_one("pr_6")
+      cam_io_2 = dsc_find_one("sl_6")
+      object = "pr_6"
+      go_load = True
+      return (cam_io_1 and cam_io_2)
+    elif do_cam[loc_ws] == 2:
+      return dsc_find_one("sl_6")
+    elif do_cam[loc_ws] == 3:
+      return dsc_find_one("pr_6")
+    else:
+      return True
+    end
+  elif loc_ws == 6:
+    if do_cam[loc_ws] == 1:
+      cam_io_1 = dsc_find_one("pr_7")
+      cam_io_2 = dsc_find_one("sl_7")
+      object = "pr_7"
+      go_load = True
+      return (cam_io_1 and cam_io_2)
+    elif do_cam[loc_ws] == 2:
+      return dsc_find_one("sl_7")
+    elif do_cam[loc_ws] == 3:
+      return dsc_find_one("pr_7")
+    else:
+      return True
+    end
+  elif loc_ws == 7:
+    if do_cam[loc_ws] == 1:
+      cam_io_1 = dsc_find_one("pr_8")
+      cam_io_2 = dsc_find_one("sl_8")
+      object = "pr_8"
+      go_load = True
+      return (cam_io_1 and cam_io_2)
+    elif do_cam[loc_ws] == 2:
+      return dsc_find_one("sl_8")
+    elif do_cam[loc_ws] == 3:
+      return dsc_find_one("pr_8")
+    else:
+      return True
+    end
+  elif loc_ws == 8:
+    if do_cam[loc_ws] == 1:
+      cam_io_1 = dsc_find_one("pr_9")
+      cam_io_2 = dsc_find_one("sl_9")
+      object = "pr_9"
+      go_load = True
+      return (cam_io_1 and cam_io_2)
+    elif do_cam[loc_ws] == 2:
+      return dsc_find_one("sl_9")
+    elif do_cam[loc_ws] == 3:
+      return dsc_find_one("pr_9")
+    else:
+      return True
+    end
+  elif loc_ws == 9:
+    if do_cam[loc_ws] == 1:
+      cam_io_1 = dsc_find_one("pr_10")
+      cam_io_2 = dsc_find_one("sl_10")
+      object = "pr_10"
+      go_load = True
+      return (cam_io_1 and cam_io_2)
+    elif do_cam[loc_ws] == 2:
+      return dsc_find_one("sl_10")
+    elif do_cam[loc_ws] == 3:
+      return dsc_find_one("pr_10")
+    else:
+      return True
+    end
+  elif loc_ws == 10:
+    if do_cam[loc_ws] == 1:
+      cam_io_1 = dsc_find_one("pr_11")
+      cam_io_2 = dsc_find_one("sl_11")
+      object = "pr_11"
+      go_load = True
+      return (cam_io_1 and cam_io_2)
+    elif do_cam[loc_ws] == 2:
+      return dsc_find_one("sl_11")
+    elif do_cam[loc_ws] == 3:
+      return dsc_find_one("pr_11")
+    else:
+      return True
+    end
+  elif loc_ws == 11:
+    if do_cam[loc_ws] == 1:
+      cam_io_1 = dsc_find_one("pr_12")
+      cam_io_2 = dsc_find_one("sl_12")
+      object = "pr_12"
+      go_load = True
+      return (cam_io_1 and cam_io_2)
+    elif do_cam[loc_ws] == 2:
+      return dsc_find_one("sl_12")
+    elif do_cam[loc_ws] == 3:
+      return dsc_find_one("pr_12")
+    else:
+      return True
+    end
+  elif loc_ws == 12:
+    if do_cam[loc_ws] == 1:
+      cam_io_1 = dsc_find_one("pr_13")
+      cam_io_2 = dsc_find_one("sl_13")
+      object = "pr_13"
+      go_load = True
+      return (cam_io_1 and cam_io_2)
+    elif do_cam[loc_ws] == 2:
+      return dsc_find_one("sl_13")
+    elif do_cam[loc_ws] == 3:
+      return dsc_find_one("pr_13")
+    else:
+      return True
+    end
+  elif loc_ws == 13:
+    if do_cam[loc_ws] == 1:
+      cam_io_1 = dsc_find_one("pr_14")
+      cam_io_2 = dsc_find_one("sl_14")
+      object = "pr_14"
+      go_load = True
+      return (cam_io_1 and cam_io_2)
+    elif do_cam[loc_ws] == 2:
+      return dsc_find_one("sl_14")
+    elif do_cam[loc_ws] == 3:
+      return dsc_find_one("pr_14")
+    else:
+      return True
+    end
+  elif loc_ws == 14:
+    if do_cam[loc_ws] == 1:
+      cam_io_1 = dsc_find_one("pr_15")
+      cam_io_2 = dsc_find_one("sl_15")
+      object = "pr_15"
+      go_load = True
+      return (cam_io_1 and cam_io_2)
+    elif do_cam[loc_ws] == 2:
+      return dsc_find_one("sl_15")
+    elif do_cam[loc_ws] == 3:
+        return dsc_find_one("pr_15")
+    else:
+      return True
+    end
+  else:
+    return True
+  end
+end
+
+################################
+# Cam check movement
+################################
+def cam_check(loc_tray,loc_pos,loc_ws,h_over=0.15):
+  rev_move("clear")
+  if do_cam[loc_ws] == 0:
+    return True
+  end
+  tcp_up_cam = pose_trans(cam,p[0,0,-h_over,0,0,0])
+  set_tcp(tcp_up_cam)
+  last_tcp = get_tcp_offset()
+  if loc_tray == 0:
+    cam_pos = picks1[loc_pos]
+  elif loc_tray == 1:
+    cam_pos = picks2[loc_pos]
+  elif loc_tray == 2:
+    cam_pos = picks3[loc_pos]
+  elif loc_tray == 3:
+    cam_pos = picks4[loc_pos]
+  elif loc_tray == 4:
+    cam_pos = picks5[loc_pos]
+  elif loc_tray == 5:
+    cam_pos = picks6[loc_pos]
+  end
+  
+  if cam_pos[1] < -0.6:
+    safe_pos = pose_trans(cam_pos,p[-0.1,0,0,0,d2r(-9),0])
+    movej(get_inverse_kin(safe_pos,near_right),a=d2r(ins_acc_j),v=d2r(ins_vel_j),r=big_radius)
+    rev_move("clear+add")
+  end
+  cam_fin = pose_trans(cam_pos,p[0,0,0,0,d2r(-9),0])
+  movej(get_inverse_kin(cam_fin,near_right),a=d2r(ins_acc_j),v=d2r(ins_vel_j))
+  rev_move("clear+add")
+  # do cam stuff
+  
+  ##Daniel
+  i = 0 
+  while i < 2 :
+    sleep(0.2)
+    res = cam_handler(loc_ws)
+      if res ==False :
+        #popup(res, "res=", blocking=True)
+       else : 
+        #popup(res, "res=", blocking=True)
+        break
+      end
+    i = i + 1
+  end
+
+  ## Ende Daniel 
+  return res
+end
+
+################################
+# PickUp from tray Routine
+################################
+def pick_up_tray(loc_tray,loc_pos,loc_ws,h_over=0.06):
+  rev_move("clear")
+  id = floor(loc_tray/2)
+  if loc_tray < 2:
+    near = near_left
+  else:
+    near = near_right
+  end
+  if point_dist(get_forward_kin(near_dosier),get_actual_tcp_pose()) < 0.1:
+    movej(home_q,a=d2r(ins_acc_j),v=d2r(ins_vel_j),r=big_radius)
+  end
+  if id == 2: 
+    cam_io = cam_check(loc_tray,loc_pos,loc_ws)
+    if not cam_io:
+      return False
+    end
+  else:
+  
+    cam_io = True
+  end
+  # Tcp setzen 
+  tcp(id+tcpup)
+  if loc_tray == 0:
+    pick = picks1[loc_pos]
+  elif loc_tray == 1:
+    pick = picks2[loc_pos]
+  elif loc_tray == 2:
+    pick = picks3[loc_pos]
+  elif loc_tray == 3:
+    pick = picks4[loc_pos]
+  elif loc_tray == 4:
+    pick = pose_trans(picks5[loc_pos],p[0,0,0,0,0,d2r(-32)])
+  elif loc_tray == 5:
+    pick = pose_trans(picks6[loc_pos],p[0,0,0,0,0,d2r(-32)])
+    movej(near_tray_5,a=d2r(ins_acc_j),v=d2r(ins_vel_j),t=0,r=big_radius)
+    rev_move("clear+add")
+    if pick[1]>-0.44:
+      over_pick = pose_trans(pick,p[0.1,0,h_over,0,0,0])
+      movej(get_inverse_kin(over_pick,near),a=d2r(ins_acc_j),v=d2r(ins_vel_j),t=0,r=small_radius)
+    end
+  end
+  if pick[1] < -0.6:
+    safe_pos = pose_trans(pick,p[-0.1,0,h_over,0,0,0])
+    movej(get_inverse_kin(safe_pos,near),a=d2r(ins_acc_j),v=d2r(ins_vel_j),t=0,r=big_radius)
+    rev_move("clear+add")
+  end
+  over_pick = pose_trans(pick,p[0,0,h_over,0,0,0])
+  movej(get_inverse_kin(over_pick,near),a=d2r(ins_acc_j),v=d2r(ins_vel_j),t=0,r=small_radius)
+  rev_move("clear+add")
+  if cam_io == True:
+    movel(pick,a=ins_acc_l/3,v=ins_vel_l)
+    res = gripper(id,True)
+    movel(over_pick,a=ins_acc_l/2,v=ins_vel_l)
+    if res:
+      res = chk_gr()
+    end
+    if pick[1] < -0.6:
+      movej(get_inverse_kin(safe_pos,near),a=d2r(ins_acc_j),v=d2r(ins_vel_j))
+      rev_move("clear+add")
+    end
+  else:
+    movel(over_pick,a=ins_acc_l,v=ins_vel_l)
+    res = True
+  end
+  rev_move("clear")
+  return (res and cam_io)
+end
+
+################################
+# Put on Dosierstation
+################################
+def put_on_st(loc_ws):
+  rev_move("clear")
+  
+  if int_dir == 0 or int_dir==1:
+    r = small_radius
+  else:
+    r = 0
+  end
+  
+  cur_pos = get_actual_tcp_pose()
+  if cur_pos[0] < 0.114 : # Wenn Rob nicht in naehe von DS immer ueber ZWP fahren.
+    movej(near_dosier,a=d2r(ins_acc_j),v=d2r(ins_vel_j),t=0,r=big_radius)
+  elif int_dir == 0 or int_dir==2:
+    movej(near_dosier,a=d2r(ins_acc_j),v=d2r(ins_vel_j),t=0,r=big_radius)
+  end
+ 
+  rev_move("clear+add")
+  i = 0
+  h = 0
+  while i < 3:
+    h = h + heights[loc_ws,i] / 1000
+    tcp(i+tcpup)
+    
+    ##Tim
+    put = pose_trans(put_dosier,p[0,0,h,0,0,0])
+    ## Ende Tim
+    
+    ##Anderung Daniel 
+    #if (i == 0) :
+    #  put = pose_trans(put_dosier,p[0.002,0,h,0,0,0])
+    #elif (i == 1):
+    #  put = pose_trans(put_dosier,p[0.0014,0,h,0,0,0])
+    #elif (i == 2):
+    #  put = pose_trans(put_dosier,p[0,0,h,0,0,0])
+    #end
+    ## Ende Daniel
+    over_put = pose_trans(put,p[0,0,0.01,0,0,0])
+    movel(over_put,a=ins_acc_l,v=ins_vel_l,r=0.005)
+    rev_move("clear+add")
+    movel(put,a=ins_acc_l/3,v=ins_vel_l)
+    res = chk_gr()
+    gripper(i,False)
+    sleep(0.2)
+    movel(over_put,a=ins_acc_l,v=ins_vel_l,r=0.005)
+    i = i + 1
+  end
+
+  if int_dir == 0 or int_dir==1:
+    movej(near_dosier,a=d2r(ins_acc_j),v=d2r(ins_vel_j))
+  end
+
+
+  rev_move("clear+add")
+  return res
+end
+
+################################
+# Get from Dosierstation
+################################
+def get_from_st():
+  rev_move("clear")
+  if int_dir == 0 or int_dir==1:
+    r = small_radius
+  else:
+    r = 0
+  end
+  tcp(6)
+  cur_pos = get_actual_tcp_pose()
+  if cur_pos[0] < 0.114 : # Wenn Rob nicht in Naehe von DS immer ueber ZWP fahren.
+    movej(near_dosier_gr4,a=d2r(ins_acc_j),v=d2r(ins_vel_j),t=0,r=big_radius)
+  elif int_dir == 0 or int_dir==2:
+    movej(near_dosier_gr4,a=d2r(ins_acc_j),v=d2r(ins_vel_j),t=0,r=big_radius)
+  end
+
+  rev_move("clear+add") 
+  before_get = pose_trans(pick_up_dos,p[-0.07,0,0,0,0,0])
+  movel(before_get,a=ins_acc_l,v=ins_vel_l)
+  
+  if modbus_get_signal_status(GR4, False) == 0:
+    gripper(3,False) # False = Greifer Offen
+  end
+  
+  sleep(0.4)
+  rev_move("add")
+  movel(pick_up_dos,a=ins_acc_l/4,v=ins_vel_l)
+  res = gripper(3,True)
+  movel(before_get,a=ins_acc_l,v=ins_vel_l,r=r)
+  if int_dir == 0 or int_dir==1:
+    movej(near_dosier_gr4,a=d2r(ins_acc_j)/4,v=d2r(ins_vel_j))
+  end
+  rev_move("clear+add")
+  
+  return res
+end
+
+################################
+# Put/Get on/from heater
+################################
+def heater(pos,get=False,dist_heater=0.070425):
+  #popup(pos , "pos=" , blocking = True)
+  rev_move("clear")
+  if int_dir == 0 or int_dir==1:
+    r = small_radius
+  else:
+    r = 0
+  end
+  tcp(6)
+  if sim==1:
+    put = pose_trans(hs_frame_kalt,p[0,-pos*0.07015,0,0,0,0])
+  else:
+    put = pose_trans(hs_frame,p[0,-pos*dist_heater,0,0,0,0])
+  end
+  
+  if int_dir == 0 or int_dir==2:
+    movej(near_heater,a=d2r(ins_acc_j),v=d2r(ins_vel_j),t=0,r=big_radius)
+  end           
+  rev_move("clear+add",near_heater)
+  before = pose_trans(put,p[-0.15,0,0,0,0,0])
+  movel(before,a=ins_acc_l,v=ins_vel_l)
+  sleep(0.4)
+  rev_move("add")
+  
+  ## Daniel Ein bissschen füher ablegen um bewegen durch Vibration abzufangen.
+  status_gripper = modbus_get_signal_status(GR4, False)
+  #popup(status_gripper , "Status=",blocking = True)
+
+  if status_gripper == 1 :
+    #popup(status_gripper , "Status=",blocking = True)
+    if pos > 6 :
+      put = pose_trans(put,p[0,0,0.001,0,0,0]) #2mm vorher Ablegen
+    end 
+  end
+  ## Ende Daniel
+  
+  movel(put,a=ins_acc_l/4,v=ins_vel_l/2)
+  res = gripper(3,get)
+  movel(before,a=ins_acc_l,v=ins_vel_l,r=r)
+  if int_dir == 0 or int_dir==1:
+    movej(near_heater,a=d2r(ins_acc_j),v=d2r(ins_vel_j))
+  end
+  rev_move("clear+add",near_heater)
+  
+  if pos == 0 : #Um beim leerfahren zu vermeiden das robi 2x in die Position fährt beim Abholen
+    sleep(0.5)
+  end
+  return res
+end
+
+################################
+# Put IO
+################################
+def put_on_io(pos,dist_io=0.0794):
+  rev_move("clear")
+  if int_dir == 0 or int_dir==1:
+    r = small_radius
+  else:
+    r = 0
+  end
+  tcp(6)
+  put = pose_trans(io_frame,p[0,-pos*dist_io,0,0,0,0])
+  if int_dir == 0 or int_dir==2:
+    movej(near_heater,a=d2r(ins_acc_j),v=d2r(ins_vel_j),t=0,r=big_radius)
+  end
+  rev_move("clear+add",near_heater)
+  #over = pose_trans(put,p[-0.045,0,0.1,0,0,0])
+  over_before = pose_trans(put,p[-0.075,0,0.1,0,0,0])
+  over = pose_trans(put,p[-0.075,0,0.001,0,0,0])
+  before = pose_trans(put,p[-0.075,0,0,0,0,0])
+  movel(over_before,a=ins_acc_l,v=ins_vel_l,r=small_radius)
+  rev_move("add")
+  movel(over,a=ins_acc_l,v=ins_vel_l,r=small_radius)
+  movel(put,a=ins_acc_l/2,v=ins_vel_l/2)
+  gripper(3,False)
+  movel(before,a=ins_acc_l,v=ins_vel_l,r=small_radius)
+  movel(over_before,a=ins_acc_l,v=ins_vel_l,r=r)
+  
+  ###Tim
+  #if int_dir == 0 or int_dir==1:
+  #  movej(near_heater,a=d2r(ins_acc_j),v=d2r(ins_vel_j))
+  #end
+  ####
+  
+  ###Daniel
+  # Robi soll immer ueber die ZWP fahren
+  movej(near_heater,a=d2r(ins_acc_j),v=d2r(ins_vel_j))
+  
+  ###
+  rev_move("clear+add",near_heater)
+  return True
+end
+
+################################
+# Gripper control
+################################
+global gr_ok = [False,False,False]
+thread gr_ctrl():
+  while 1:
+    # Gripper 1
+    if modbus_get_signal_status(GR1, False) == 1:
+      if modbus_get_signal_status(GR1_STATUS, False) == 2:
+        gr_ok[0] = False
+      else:
+        gr_ok[0] = True
+      end
+    else:
+      gr_ok[0] = True
+    end
+    # Gripper 2
+    if modbus_get_signal_status(GR2, False) == 1:
+      if modbus_get_signal_status(GR2_STATUS, False) == 2:
+        gr_ok[1] = False
+      else:
+        gr_ok[1] = True
+      end
+    else:
+      gr_ok[1] = True
+    end
+    # Gripper 3
+    if modbus_get_signal_status(GR3, False) == 1:
+      if modbus_get_signal_status(GR3_STATUS, False) == 2:
+        gr_ok[2] = False
+      else:
+        gr_ok[2] = True
+      end
+    else:
+      gr_ok[2] = True
+    end
+    sleep(0.1)
+  end
+end
+thr_gr_ctrl = run gr_ctrl()
+
+def chk_gr():
+  return (gr_ok[0] and gr_ok[1] and gr_ok[2])
+end
+
+def gripper(id,gripp):
+# Get Modbus Signals
+  if id == 0:
+    GR_CT = GR1
+    GR_STA = GR1_STATUS
+  elif  id == 1:
+    GR_CT = GR2
+    GR_STA = GR2_STATUS
+  elif  id == 2:
+    GR_CT = GR3
+    GR_STA = GR3_STATUS
+  elif  id == 3:
+    GR_CT = GR4
+    GR_STA = GR4_STATUS
+  else:
+    GR_CT = GR1
+    GR_STA = GR1_STATUS
+  end
+  # Check for gripp or release
+  if gripp == True:
+    set = 1
+  else:
+    set = 2
+  end
+  modbus_set_output_register(GR_CT,set, False)
+  if gripp == True:
+    sleep(0.3)
+    i = 0
+    if id==3:
+      sleep(0.3)
+      if modbus_get_signal_status(GR_STA, False) == 2:
+        return True
+      else:
+        modbus_set_output_register(GR_CT,2, False)
+        return False
+      end
+    else:
+      sleep(0.2)
+      while modbus_get_signal_status(GR_STA, False) != 1 and i < 8:
+        i = i + 1
+        sleep(0.1)
+      end
+      if modbus_get_signal_status(GR_STA, False) == 1:
+        return True
+      else:
+        modbus_set_output_register(GR_CT,2, False)
+        return False
+      end
+    end
+  else:
+    if id == 3:
+      sleep(0.3)
+    else:
+      sleep(0.4)
+    end
+    return True
+  end
+end
+
+################################
+# Reverse pos function
+################################
+def rev_move(fct="add",pose=[99999,0,0,0,0,0]):
+  if fct == "add":
+    old = rev_poses
+    rev_poses[1] = old[0]
+    rev_poses[2] = old[1]
+    rev_poses[3] = old[2]
+    rev_poses[4] = old[3]
+    if pose[0] != 99999:
+      rev_poses[0] = get_forward_kin(pose)
+    else:
+      rev_poses[0] = get_actual_tcp_pose()
+    end
+      
+  elif fct == "clear":
+    i = 4
+    while i > -1:
+      rev_poses[i] = home_pos_p
+      i = i - 1
+    end
+  elif fct == "clear+add":
+    i = 4
+    while i > -1:
+      rev_poses[i] = home_pos_p
+      i = i - 1
+    end
+    old = rev_poses
+    rev_poses[1] = old[0]
+    rev_poses[2] = old[1]
+    rev_poses[3] = old[2]
+    rev_poses[4] = old[3]
+    if pose[0] != 99999:
+      rev_poses[0] = get_forward_kin(pose)
+    else:
+      rev_poses[0] = get_actual_tcp_pose()
+    end
+  end
+end
+
+################################
+# Empty Gripper
+################################
+def empty_run():
+  if modbus_get_signal_status(GR1, False) == 1 or modbus_get_signal_status(GR2, False) == 1 or modbus_get_signal_status(GR3, False) == 1 :
+    #global empty_pos = p[0.456 , -0.12352 , 0.12952 , 0.01 , -0.139 , -0.026]
+    global empty_pos_unterlegscheibe = p[0.46571 , -0.11398 , 0.08365 , 0.01 , -0.139 , -0.025]
+    global empty_pos = p[0.39372 , -0.11399 , 0.08365 , 0.01 , -0.139 , -0.025]
+    i = 0
+    while i < 3 :
+        if i == 1 or i == 2 : 
+            tcp(i+tcpup)
+            movel(empty_pos)
+            gripper(i,False)
+        elif i == 0 :
+            tcp(i+tcpup)
+            movel(empty_pos_unterlegscheibe)
+            gripper(i,False)
+            
+        end
+        i = i + 1
+    end
+    rev_move("clear")
+    movej(home_q)
+  end
+end
+
+################################
+# JOBBER
+################################
+def jobber(loc_job):
+    if loc_job == 1:
+      # pick up from tray
+      return pick_up_tray(int_tray,int_pos,int_ws)
+    elif loc_job == 2:
+      # Put on Dosierstation
+      return put_on_st(int_ws)
+    elif loc_job == 3:
+      # Get from Dosierstation
+      return get_from_st()
+    elif loc_job == 4:
+      # Part on IO Station
+      return put_on_io(int_pos)
+    elif loc_job == 5:
+      # Go Home Routine
+      return go_home()
+    elif loc_job == 6:
+      # Get part from heater
+      return heater(int_pos,True)
+    elif loc_job == 7:
+      # Put part on heater
+      return heater(int_pos,False)
+    elif loc_job == 8:
+      # All vaks off
+      empty_run()
+      sleep(1)
+      return True
+    elif loc_job == 9:
+      # Wartungsposition
+      go_home()
+      movej(near_dosier)
+      sleep(1)
+      return True
+    elif loc_job == 10:
+      # Calculate tray positions
+      return calc_pick_poses(int_ws)
+    else:
+      return False
+    end
+end
+
+################################
+# Do Job
+################################
+def func_caller():
+  status_job = NA
+  status_ur = NA
+  while True:
+    if job > 0 and status_ur != UR_ERROR:
+      sleep(0.05)
+      read_vars()
+      status_ur = UR_BUSY
+      status_job = JOB_RUNNING
+      status = jobber(job)
+      if not status:
+        #status_ur = UR_ERROR
+        status_job = JOB_NOK
+      else:
+        status_job = JOB_OK
+      end
+    else:
+      if calc:
+        if status_ur == UR_ERROR:
+          while modbus_get_signal_status(RESET, False) == 0:
+            sync()
+          end
+          check_home()
+          status_job = NA
+        else:
+          check_home()
+          #status_job = NA
+        end
+      end
+      sleep(0.01)
+    end
+  end
+end
+
+##########################
+# Homing routine
+##########################  
+def go_home():
+  set_tcp(gr2_small)
+  # Check Comm
+  # Reverse movements
+  if pose_dist(get_actual_tcp_pose(),home_pos_p) > 0.2:
+    set_tcp(last_tcp)
+    i=0
+    while i<5:
+      if rev_poses[i] != p[0,0,0,0,0,0]:
+        movel(rev_poses[i],a=d2r(80),v=d2r(60))
+      end
+      i = i + 1
+    end
+  end
+  rev_move("clear")
+  movej(home_q)
+
+    
+  tcp(1)
+  return True
+end
+
+
+################################
+# PickUp from tray Routine
+################################
+def suchparameter_check(loc_tray,loc_pos,loc_ws,h_over=0.06):
+  rev_move("clear")
+  id = floor(loc_tray/2)
+  if loc_tray < 2:
+    near = near_left
+  else:
+    near = near_right
+  end
+  if point_dist(get_forward_kin(near_dosier),get_actual_tcp_pose()) < 0.1:
+    movej(home_q,a=d2r(ins_acc_j),v=d2r(ins_vel_j),r=big_radius)
+  end
+  if id == 2: 
+    cam_io = cam_check(loc_tray,loc_pos,loc_ws)
+    if not cam_io:
+      return False
+    end
+  else:
+  
+    cam_io = True
+  end
+  # Tcp setzen 
+  tcp(id+tcpup)
+  if loc_tray == 0:
+    pick = picks1[loc_pos]
+  elif loc_tray == 1:
+    pick = picks2[loc_pos]
+  elif loc_tray == 2:
+    pick = picks3[loc_pos]
+  elif loc_tray == 3:
+    pick = picks4[loc_pos]
+  elif loc_tray == 4:
+    pick = pose_trans(picks5[loc_pos],p[0,0,0,0,0,d2r(-32)])
+  elif loc_tray == 5:
+    pick = pose_trans(picks6[loc_pos],p[0,0,0,0,0,d2r(-32)])
+    movej(near_tray_5,a=d2r(ins_acc_j),v=d2r(ins_vel_j),t=0,r=big_radius)
+    rev_move("clear+add")
+    if pick[1]>-0.44:
+      over_pick = pose_trans(pick,p[0.1,0,h_over,0,0,0])
+      movej(get_inverse_kin(over_pick,near),a=d2r(ins_acc_j),v=d2r(ins_vel_j),t=0,r=small_radius)
+    end
+  end
+  if pick[1] < -0.6:
+    safe_pos = pose_trans(pick,p[-0.1,0,h_over,0,0,0])
+    movej(get_inverse_kin(safe_pos,near),a=d2r(ins_acc_j),v=d2r(ins_vel_j),t=0,r=big_radius)
+    rev_move("clear+add")
+  end
+  #over_pick = pose_trans(pick,p[0,0,h_over,0,0,0])
+  #movej(get_inverse_kin(over_pick,near),a=d2r(ins_acc_j),v=d2r(ins_vel_j),t=0,r=small_radius)
+  rev_move("clear+add")
+  res = True
+  if cam_io == True:
+    popup("Erkennung erfolgreich",blocking = True)
+  else:
+    popup("Erkennung NICHT erfolgreich",blocking = True)
+  end
+  return (res and cam_io)
+end
